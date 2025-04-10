@@ -2,18 +2,18 @@ public class GottRider implements Comparable<GottRider>{
     private String name;
     private long previousRides;
     private double averageReview;
-    private double totalReviewGiven; // a private field that I use to calculate the averageReview more easily.
+    private double totalStarsGiven; // a private field that I use to calculate the averageReview more easily.
 
     public GottRider (String name, Long previousRides, Double averageReviewGiven){
         this.name = name;
         this.previousRides = previousRides;
         this.averageReview = averageReviewGiven;
-        this.totalReviewGiven = previousRides * averageReviewGiven;
+        this.totalStarsGiven = previousRides * averageReviewGiven;
     }
     public void rideCompleted (Long starsGiven){
         this.previousRides++;
-        this.totalReviewGiven += starsGiven;
-        this.averageReview = totalReviewGiven / this.previousRides;
+        this.totalStarsGiven += starsGiven;
+        this.averageReview = totalStarsGiven / this.previousRides;
     }
     public String getName(){
         return this.name;

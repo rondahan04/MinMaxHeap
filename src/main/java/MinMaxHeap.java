@@ -6,50 +6,56 @@ public class MinMaxHeap <T extends Comparable <T>>{
     private T[] maxHeap;
     private int[] minToMax;
     private int[] maxToMin;
-     private int capacity;
+    private int capacity;
     private int size;
+
+    // ###### CONSTRUCTORS ######
     public MinMaxHeap() {// O(1), default constructor , constructing a heap with 50 capacity
-        capacity = DEFAULT_CAPACITY;
-        minHeap = (T[]) new Comparable[capacity];
-        maxHeap = (T[]) new Comparable[capacity];
-        minToMax = new int[capacity];
-        maxToMin = new int[capacity];
-        size = 0;
+        this.capacity = DEFAULT_CAPACITY;
+        this.minHeap = (T[]) new Comparable[capacity];
+        this.maxHeap = (T[]) new Comparable[capacity];
+        this.minToMax = new int[capacity];
+        this.maxToMin = new int[capacity];
+        this.size = 0;
     }
     public MinMaxHeap(int initialCapacity){ // O(1), constructing a heap of size initialCapacity
-        capacity = initialCapacity +1; // +1 because im using 1 based indexing
-        minHeap = (T[]) new Comparable[capacity];
-        maxHeap = (T[]) new Comparable[capacity];
-        minToMax = new int[capacity];
-        maxToMin = new int[capacity];
-        size = 0;
+        if (initialCapacity == 0) {
+            throw new IllegalArgumentException("Initial capacity must be at least 1");
+        }
+        this.capacity = initialCapacity +1; // +1 because im using 1 based indexing
+        this.minHeap = (T[]) new Comparable[capacity];
+        this.maxHeap = (T[]) new Comparable[capacity];
+        this.minToMax = new int[capacity];
+        this.maxToMin = new int[capacity];
+        this.size = 0;
     }
     public MinMaxHeap(T[]initialData){  // O(n), constructing a heap from InitialData array
-        size = initialData.length;
-        capacity = size;
-        minHeap = (T[]) new Comparable[size+1]; // size is +1 because im using 1 based indexing
-        maxHeap = (T[]) new Comparable[size+1];
-        minToMax = new int[size+1];
-        maxToMin = new int[size+1];
-        int j = 1;
+        this.size = initialData.length;
+        this.capacity = size;
+        this.minHeap = (T[]) new Comparable[size+1]; // size is +1 because im using 1 based indexing
+        this.maxHeap = (T[]) new Comparable[size+1]; // size is +1 because im using 1 based indexing
+        this.minToMax = new int[size+1]; // size is +1 because im using 1 based indexing
+        this.maxToMin = new int[size+1]; // size is +1 because im using 1 based indexing
+        int j = 1; // j starts from 1 because of the 1 based indexing
         int id = 0;
-        // Copy the initial data into the minHeap and maxHeap
+        // Copy the initialData array into the minHeap and maxHeap in no particular order.
         while (id < initialData.length){
-            minHeap[j] = initialData[id];
-            maxHeap[j] = initialData[id];
-            minToMax[j] = j;
-            maxToMin[j] = j;
+            this.minHeap[j] = initialData[id];
+            this.maxHeap[j] = initialData[id];
+            this.minToMax[j] = j;
+            this.maxToMin[j] = j;
             j++;
             id++;
         }
-        // Build the minHeap and maxHeap
+        // Build the minHeap and maxHeap according to the Heap property.
         for (int i = size / 2; i >= 1; i--) {
             percolateDownMin(i);
             percolateDownMax(i);
         }
     }
+    // ###### METHODS ######
     public void insert (T element){ // O(n) if the heap is full, otherwise O(log(n))
-        if (this.size == minHeap.length - 1) { // check if the heap is full
+        if (this.size == this.capacity - 1) { // check if the heap is full
             resize(); // resize the heap
         }
         this.size++;
@@ -62,29 +68,29 @@ public class MinMaxHeap <T extends Comparable <T>>{
     }
     private void resize() { // helper function for the insert.
         this.capacity *= 2;
-        T[] newMinHeap = (T[]) new Comparable[capacity];
-        T[] newMaxHeap = (T[]) new Comparable[capacity];
-        int[] newMinToMax = new int[capacity];
-        int[] newMaxToMin = new int[capacity];
-        for (int i = 1; i <= this.size; i++) { // create new mappings
+        T[] newMinHeap = (T[]) new Comparable[capacity]; // creating a new MinHeap with 2*capacity
+        T[] newMaxHeap = (T[]) new Comparable[capacity]; // creating a new MaxHeap with 2*capacity
+        int[] newMinToMaxMapping = new int[capacity]; // creating a new minToMax mapping with 2*capacity
+        int[] newMaxToMinMapping = new int[capacity]; // creating a new maxToMin mapping with 2*capacity
+        for (int i = 1; i <= this.size; i++) { // create new mappings i starts from 1 because of the 1 based indexing until this.size which is the last element.
             newMinHeap[i] = this.minHeap[i];
             newMaxHeap[i] = this.maxHeap[i];
-            newMinToMax[i] = this.minToMax[i];
-            newMaxToMin[i] = this.maxToMin[i];
+            newMinToMaxMapping[i] = this.minToMax[i];
+            newMaxToMinMapping[i] = this.maxToMin[i];
         }
         // update new mappings
         this.minHeap = newMinHeap;
         this.maxHeap = newMaxHeap;
-        this.minToMax = newMinToMax;
-        this.maxToMin = newMaxToMin;
+        this.minToMax = newMinToMaxMapping;
+        this.maxToMin = newMaxToMinMapping;
     }
     public T deleteMin(){ // O(log(n)) ,delete min from maxHeap and minHeap and update the minToMax and maxToMin
         if (this.size == 0){
-            throw new NoSuchElementException("Heap is empty");
+            throw new NoSuchElementException("No element to be deleted as the Heap is empty.");
         }
         T min = this.minHeap[1];
         int index = this.minToMax[1]; // index that should be removed from the MaxHeap
-        this.minHeap[1] = this.minHeap[this.size];
+        this.minHeap[1] = this.minHeap[this.size]; // doing the swap
         this.maxHeap[index] = this.maxHeap[this.size]; // necessary only if the min is not the last element
         this.maxToMin[index] = 1; // updating mapping
         this.minToMax[1] = index; // updating mapping
@@ -95,7 +101,7 @@ public class MinMaxHeap <T extends Comparable <T>>{
     }
     public T deleteMax(){ // O(log(n)), delete max from minHeap and maxHeap and update the minToMax and maxToMin
         if (this.size == 0){
-            throw new NoSuchElementException("Heap is empty");
+            throw new NoSuchElementException("No element to be deleted as the Heap is empty.");
         }
         T max = this.maxHeap[1];
         int index = this.maxToMin[1]; // index that should be removed from the MinHeap
@@ -124,86 +130,95 @@ public class MinMaxHeap <T extends Comparable <T>>{
     public int getSize () { // O(1), returns the size of the heap
         return this.size;
     }
-    private int parent(int i){ // O(1), helper function for better readabillity
-        return (i/2);
-    }
-    private int leftChild (int i){ //O(1), helper function for better readabillity
-        return (2*i);
-    }
-    private int rightChild (int i){ //O(1), helper function for better readabillity
-        return (2*i + 1);
-    }
     private void percolateDownMax (int i){
-        while ( 2 * i <= size) { //percolate down the max heap
-            int left = leftChild(i);
-            int right = rightChild(i);
-            int largest = i;
-            if (left <= size && maxHeap[left].compareTo(maxHeap[largest]) > 0) {
-                largest = left;
+        int left;
+        int right;
+        int maximal;
+        while ( 2 * i <= this.size) { //percolate down the max heap, 2*i<=size is to ensure that it has at least one child.
+             left = leftChild(i);
+             right = rightChild(i);
+             maximal = i;
+            if (left <= this.size && this.maxHeap[left].compareTo(this.maxHeap[maximal]) > 0) {
+                maximal = left;
             }
-            if (right <= size && maxHeap[right].compareTo(maxHeap[largest]) > 0) {
-                largest = right;
+            if (right <= this.size && this.maxHeap[right].compareTo(this.maxHeap[maximal]) > 0) {
+                maximal = right;
             }
-            if (largest != i) {
-                swapMax(largest, i);
-                i = largest;
+            if (maximal != i) {
+                swapMax(maximal, i);
+                i = maximal;
             } else {
-                break;
+                break; // stop if the heap property is satisfied.
             }
         }
     }
     private void percolateUpMax (int i){
-        while (i > 1 && maxHeap[i].compareTo(maxHeap[parent(i)]) > 0) { //percolate up the max heap
+        while (i > 1 && this.maxHeap[i].compareTo(this.maxHeap[parent(i)]) > 0) { //percolate up the max heap ,i>1 is to ensure that im not in the root
             swapMax(i, parent(i));
             i = parent(i);
         }
     }
     private void percolateDownMin (int i){
-        while (2 * i <= size) { //percolate down the min heap
-            int left = leftChild(i);
-            int right = rightChild(i);
-            int smallest = i;
-            if (left <= size && minHeap[left].compareTo(minHeap[smallest]) < 0) {
-                smallest = left;
+        int left;
+        int right;
+        int minimal;
+        while (2 * i <= this.size) { //percolate down the min heap, 2*i<=size is to ensure that it has at least one child.
+             left = leftChild(i);
+             right = rightChild(i);
+             minimal = i;
+            if (left <= this.size && this.minHeap[left].compareTo(this.minHeap[minimal]) < 0) {
+                minimal = left;
             }
-            if (right <= size && minHeap[right].compareTo(minHeap[smallest]) < 0) {
-                smallest = right;
+            if (right <= this.size && this.minHeap[right].compareTo(this.minHeap[minimal]) < 0) {
+                minimal = right;
             }
-            if (smallest != i) {
-                swapMin(smallest, i);
-                i = smallest;
+            if (minimal != i) {
+                swapMin(minimal, i);
+                i = minimal;
             } else {
                 break;
             }
         }
     }
     private void percolateUpMin (int i){
-        while (i > 1 && minHeap[i].compareTo(minHeap[parent(i)]) < 0) { //percolate up the min heap
+        while (i > 1 && this.minHeap[i].compareTo(this.minHeap[parent(i)]) < 0) { //percolate up the min heap, i>1 is to ensure that im not in the root
             swapMin(i, parent(i));
             i = parent(i);
         }
     }
+    // ###### MY HELPER METHODS ######
+    private int parent(int i){ // O(1), helper function for better readabillity
+        return (i / 2); // no need floor as its int.
+    }
+    private int leftChild (int i){ //O(1), helper function for better readabillity
+        return (2 * i);
+    }
+    private int rightChild (int i){ //O(1), helper function for better readabillity
+        return (2 * i + 1);
+    }
     private void swapMax (int i, int j){ //O(1) helper function for the percolate function.
-            T temp = maxHeap[i];
-            maxHeap[i] = maxHeap[j];
-            maxHeap[j] = temp;
-            int tempIndex = maxToMin[i];
-            maxToMin[i] = maxToMin[j];
-            maxToMin[j] = tempIndex;
-            minToMax[maxToMin[i]] = i;
-            minToMax[maxToMin[j]] = j;
+            int tempElementIndex;
+            T tempElement = this.maxHeap[i];
+            this.maxHeap[i] = this.maxHeap[j];
+            this.maxHeap[j] = tempElement;
+            tempElementIndex = this.maxToMin[i];
+            this.maxToMin[i] = this.maxToMin[j];
+            this.maxToMin[j] = tempElementIndex;
+            this.minToMax[this.maxToMin[i]] = i;
+            minToMax[this.maxToMin[j]] = j;
     }
     private void swapMin (int i, int j){ // O(1) helper function for the percolate function.
-            T temp = minHeap[i];
-            minHeap[i] = minHeap[j];
-            minHeap[j] = temp;
-            int tempIndex = minToMax[i];
-            minToMax[i] = minToMax[j];
-            minToMax[j] = tempIndex;
-            maxToMin[minToMax[i]] = i;
-            maxToMin[minToMax[j]] = j;
+            int tempElementIndex;
+            T tempElement = this.minHeap[i];
+            this.minHeap[i] = this.minHeap[j];
+            this.minHeap[j] = tempElement;
+            tempElementIndex = this.minToMax[i];
+            this.minToMax[i] = this.minToMax[j];
+            this.minToMax[j] = tempElementIndex;
+            this.maxToMin[this.minToMax[i]] = i;
+            this.maxToMin[this.minToMax[j]] = j;
     }
-
+ // ###### MY UNRELATED FUNCTIONS TO THE CODE ######
     public void toStringMinHeap(){ // tester function to see the min heap
         StringBuilder sb = new StringBuilder();
         for (int i = 1; i <= size; i++) {
