@@ -1,0 +1,15 @@
+
+# Ignore everything
+*
+
+# But not these directories (so Git can see the path down to your files)
+!src/
+!src/main/
+!src/main/java/
+
+# Then ignore all files under java
+src/main/java/*
+
+# But don't ignore the specific files you want to keep
+!src/main/java/MinMaxHeap.java
+!src/main/java/GottRider.java
