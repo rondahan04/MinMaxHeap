@@ -61,7 +61,7 @@ public class MinMaxHeap <T extends Comparable <T>>{
         if (element == null) { // given element is null
             throw new IllegalArgumentException ("Cannot Insert null element to the heap");
         }
-        if (this.size == this.capacity - 1) { // check if the heap is full
+        if (this.size >= this.capacity - 1) { // check if the heap is full
             resize(); // resize the heap
         }
         this.size++;

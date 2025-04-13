@@ -1,6 +1,7 @@
 import org.junit.Before;
 import org.junit.Test;
 
+import java.lang.reflect.Field;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -183,9 +184,9 @@ public class MinMaxHeapTest {
         }
         assertEquals(0, heapWith1000.getSize());
     }
-    /*
+
    @Test
-   public void mappingAfterInsertionToAnExistingHeap(){
+   public void mappingAfterInsertionToAnExistingHeap() throws NoSuchFieldException, IllegalAccessException{
         int maxIndex;
         int minIndex;
         List<Integer> shuffledElements = makeShuffledElementList(LARGE_HEAP_SIZE);
@@ -193,11 +194,25 @@ public class MinMaxHeapTest {
         heap.insert(10000);
         heap.insert(-5);
         heap.insert(50);
-        for(int i = 1; i <= heap.getSize(); i++){
-            maxIndex =
+        Field minToMaxField = MinMaxHeap.class.getDeclaredField("minToMax");
+        Field maxToMinField = MinMaxHeap.class.getDeclaredField("maxToMin");
+        Field minHeapField = MinMaxHeap.class.getDeclaredField("minHeap");
+        Field maxHeapField = MinMaxHeap.class.getDeclaredField("maxHeap");
+        minToMaxField.setAccessible(true);
+        maxToMinField.setAccessible(true);
+        minHeapField.setAccessible(true);
+        maxHeapField.setAccessible(true);
+        int[] minToMax = (int[]) minToMaxField.get(heap);
+        int[] maxToMin = (int[]) maxToMinField.get(heap);
+        Comparable[] minHeap = (Comparable[]) minHeapField.get(heap);
+        Comparable[] maxHeap = (Comparable[]) maxHeapField.get(heap);
+        for (int i = 1; i<= heap.getSize(); i++){
+            maxIndex = minToMax[i];
+            minIndex = maxToMin[i];
+            assertEquals(minHeap[i], maxHeap[maxIndex]);
+            assertEquals(maxHeap[i], minHeap[minIndex]);
         }
     }
-    */
     @Test
     public void negativeCapacityHeapThrowsException(){
         assertThrows(IllegalArgumentException.class, () -> new MinMaxHeap<>(-5));
@@ -249,6 +264,46 @@ public class MinMaxHeapTest {
         heap.insert("Choi Jong-In");
         assertEquals("Sung Jin-Woo", heap.findMax());
         assertEquals("Cha Hae-In", heap.findMin());
+    }
+    @Test
+    public void testMinToMaxWithReflection() throws NoSuchFieldException, IllegalAccessException {
+        MinMaxHeap<Integer> heap = new MinMaxHeap<>(10);
+        for(int i=1; i<=10; i++){
+            heap.insert(i);
+        }
+        Field minToMaxField = MinMaxHeap.class.getDeclaredField("minToMax");
+        minToMaxField.setAccessible(true);
+        int[] minToMax = (int[]) minToMaxField.get(heap);
+        Field minHeapField = MinMaxHeap.class.getDeclaredField("minHeap");
+        Field maxHeapField = MinMaxHeap.class.getDeclaredField("maxHeap");
+        minHeapField.setAccessible(true);
+        maxHeapField.setAccessible(true);
+        Comparable[] minHeap = (Comparable[]) minHeapField.get(heap);
+        Comparable[] maxHeap = (Comparable[]) maxHeapField.get(heap);
+        for (int i = 1; i <= 10; i++) {
+            int maxIndex = minToMax[i];
+            assertEquals(minHeap[i], maxHeap[maxIndex]);
+        }
+    }
+    @Test
+    public void testMaxToMinWithReflection() throws NoSuchFieldException, IllegalAccessException {
+        MinMaxHeap<Integer> heap = new MinMaxHeap<>(10);
+        for(int i=1; i<=10; i++){
+            heap.insert(i);
+        }
+        Field maxToMinField = MinMaxHeap.class.getDeclaredField("maxToMin");
+        maxToMinField.setAccessible(true);
+        int[] maxToMin = (int[]) maxToMinField.get(heap);
+        Field minHeapField = MinMaxHeap.class.getDeclaredField("minHeap");
+        Field maxHeapField = MinMaxHeap.class.getDeclaredField("maxHeap");
+        minHeapField.setAccessible(true);
+        maxHeapField.setAccessible(true);
+        Comparable[] minHeap = (Comparable[]) minHeapField.get(heap);
+        Comparable[] maxHeap = (Comparable[]) maxHeapField.get(heap);
+        for (int i = 1; i <= 10; i++) {
+            int minIndex = maxToMin[i];
+            assertEquals(maxHeap[i], minHeap[minIndex]);
+        }
     }
 
     @Test
