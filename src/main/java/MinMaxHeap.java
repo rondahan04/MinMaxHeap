@@ -8,7 +8,6 @@ public class MinMaxHeap <T extends Comparable <T>>{
     private int[] maxToMin;
     private int capacity;
     private int size;
-
     // ###### CONSTRUCTORS ######
     public MinMaxHeap() {// O(1), default constructor , constructing a heap with 50 capacity
         this.capacity = DEFAULT_CAPACITY;
@@ -17,9 +16,10 @@ public class MinMaxHeap <T extends Comparable <T>>{
         this.minToMax = new int[capacity];
         this.maxToMin = new int[capacity];
         this.size = 0;
+
     }
     public MinMaxHeap(int initialCapacity){ // O(1), constructing a heap of size initialCapacity
-        if (initialCapacity == 0) {
+        if (initialCapacity <= 0) {
             throw new IllegalArgumentException("Initial capacity must be at least 1");
         }
         this.capacity = initialCapacity +1; // +1 because im using 1 based indexing
@@ -54,7 +54,13 @@ public class MinMaxHeap <T extends Comparable <T>>{
         }
     }
     // ###### METHODS ######
-    public void insert (T element){ // O(n) if the heap is full, otherwise O(log(n))
+    public void insert (T element){ // O(n) if the heap is full, otherwise O(log(n)), if the capacity is zero throws an exception
+        if (this.capacity == 0) {
+            throw new IllegalStateException("Cannot Insert an element to a 0 capacity heap");
+        }
+        if (element == null) { // given element is null
+            throw new IllegalArgumentException ("Cannot Insert null element to the heap");
+        }
         if (this.size == this.capacity - 1) { // check if the heap is full
             resize(); // resize the heap
         }
@@ -113,15 +119,14 @@ public class MinMaxHeap <T extends Comparable <T>>{
         percolateDownMax(1); // fixing heaps
         percolateDownMin(index); // fixing heaps
         return max;
-
     }
-    public T findMin(){ // O(1) returns the minimum element in the heap otherwise, throws an exception
+    public T findMin(){ // O(1) returns the minimum element in the heap otherwise, throws an exception.
         if (this.size == 0){
             throw new NoSuchElementException("Heap is empty");
         }
         return this.minHeap[1];
     }
-    public T findMax(){ // O(1) returns the maximum element in the heap otherwise, throws an exception
+    public T findMax(){ // O(1) returns the maximum element in the heap otherwise, throws an exception.
         if (this.size == 0){
             throw new NoSuchElementException("Heap is empty");
         }

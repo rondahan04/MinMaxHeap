@@ -104,13 +104,30 @@ public class BasicMinMaxHeapTest {
      */
     @Test
     public void repeatedDeleteMinProducesElementsInAscendingOrder() {
-        System.err.println("You should implement this test! It's great for finding bugs (repeatedDeleteMinProducesElementsInAscendingOrder)");
+        int size = LARGE_HEAP_SIZE;
+        List<Integer> shuffledElements = makeShuffledElementList();
+        MinMaxHeap<Integer> heap = new MinMaxHeap<>(size);
+        for (Integer elemment : shuffledElements){
+            heap.insert(elemment);
+        }
+        List<Integer> repeatedMinimus = repeatedDeleteMin(heap);
+        assertTrue(isSortedAscending(repeatedMinimus));
     }
+    private <T extends Comparable<T>> List<T> repeatedDeleteMin(MinMaxHeap<T> heap) {
+        List<T> repeatedMinimums = new ArrayList<>();
 
-    /**
-     * Create a list of the integers in the range [0, LARGE_HEAP_SIZE) "shuffled" to a random order.
-     * Useful when writing your own tests!
-     */
+        while (heap.getSize() != 0) {
+            repeatedMinimums.add(heap.deleteMin());
+        }
+        return repeatedMinimums;
+    }
+    private <T extends Comparable<T>> boolean isSortedAscending(List<T> elements) {
+        boolean isSorted = true;
+        for (int index = 0; index < elements.size() - 1; index++) {
+            isSorted = isSorted && elements.get(index).compareTo(elements.get(index + 1)) <= 0;
+        }
+        return isSorted;
+    }
     private List<Integer> makeShuffledElementList() {
         List<Integer> shuffledElements = IntStream.range(0, LARGE_HEAP_SIZE).boxed().collect(Collectors.toCollection(ArrayList::new));
         Collections.shuffle(shuffledElements, new Random(FIXED_RANDOMNESS_SEED));

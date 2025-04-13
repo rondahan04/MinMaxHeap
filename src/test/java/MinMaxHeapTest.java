@@ -1,10 +1,7 @@
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -20,14 +17,12 @@ public class MinMaxHeapTest {
     public void setup() {
         comparables = IntStream.range(0, 5).boxed().toArray(Integer[]::new);
     }
-
     @Test
     public void unusedEmptyHeapThrowsExceptionOnDeletion() {
         MinMaxHeap<Integer> heap = new MinMaxHeap<>();
         assertThrows(Exception.class, heap::deleteMin);
         assertThrows(Exception.class, heap::deleteMax);
     }
-
     @Test
     public void usedEmptyHeapThrowsExceptionOnDeletion() {
         MinMaxHeap<Integer> heap = new MinMaxHeap<>();
@@ -90,54 +85,185 @@ public class MinMaxHeapTest {
             assertEquals(heap.findMin(), heap.deleteMin());
         }
     }
+    @Test
+    public void insertMaxDeleteMaxEquivalence() {
+        MinMaxHeap<Integer> heap = new MinMaxHeap<>(LARGE_HEAP_SIZE);
+        Integer thousand = 1000;
+        Integer five = 5;
+        Integer one = 1;
+        heap.insert(thousand);
+        heap.insert(one);
+        heap.insert(five);
+        assertEquals(thousand,heap.deleteMax());
+        assertNotEquals(one,heap.deleteMax());
+        assertEquals(one,heap.deleteMax());
+    }
+    @Test
+    public void findMinNMaxNoDeletion() {
+        MinMaxHeap<Integer> heap = new MinMaxHeap<>(LARGE_HEAP_SIZE);
+        Integer thousand = 1000;
+        Integer five = 5;
+        Integer one = 1;
+        heap.insert(thousand);
+        heap.insert(one);
+        heap.insert(five);
+        assertEquals(thousand, heap.findMax());
+        assertEquals(one, heap.findMin());
+        assertEquals(3, heap.getSize());
+    }
 
     @Test
     public void repeatedDeleteMaxProducesDescendingElementConstructedFromArray() {
         List<Integer> shuffledElements = makeShuffledElementList(LARGE_HEAP_SIZE);
-
         MinMaxHeap<Integer> heap = new MinMaxHeap<>(shuffledElements.toArray(Integer[]::new));
         List<Integer> repeatedMaximums = repeatedDeleteMax(heap);
         Collections.reverse(repeatedMaximums);
-
         assertTrue(isSortedAscending(repeatedMaximums));
-
     }
 
     @Test
     public void repeatedDeleteMaxProducesDescendingElementConstructedFromInsertions() {
         int size = LARGE_HEAP_SIZE;
         List<Integer> shuffledElements = makeShuffledElementList(size);
-
         MinMaxHeap<Integer> heap = new MinMaxHeap<>(size);
         for (Integer element : shuffledElements) {
             heap.insert(element);
         }
-
         List<Integer> repeatedMaximums = repeatedDeleteMax(heap);
         Collections.reverse(repeatedMaximums);
-
         assertTrue(isSortedAscending(repeatedMaximums));
-
     }
 
     @Test
     public void findMaxDeleteMaxEquivalence() {
         List<Integer> shuffledElements = makeShuffledElementList(LARGE_HEAP_SIZE);
-
         MinMaxHeap<Integer> heap = new MinMaxHeap<>(shuffledElements.toArray(Integer[]::new));
-
         while (heap.getSize() > 0) {
             assertEquals(heap.findMax(), heap.deleteMax());
         }
     }
+    @Test
+    public void deleteDuplicateElements() {
+        MinMaxHeap<Integer> heap = new MinMaxHeap<>(LARGE_HEAP_SIZE);
+        for (int i=1; i<=LARGE_HEAP_SIZE; i++) { // also resizing
+            heap.insert(1);
+            heap.insert(24);
+        }
+        assertEquals((Integer) 24 , heap.deleteMax());
+        assertEquals((Integer) 1 , heap.deleteMin());
+        assertEquals(198 , heap.getSize()); // inserted 200, deleted 2
+    }
+    @Test
+    public void zeroCapacityHeapThrowsException (){ // on construction.
+        assertThrows(IllegalArgumentException.class, () -> new MinMaxHeap<>(0));
+    }
+    @Test
+    public void deleteUntilZeroCapacityThenTryInsert(){
+        List <Integer> shuffledElements = makeShuffledElementList(LARGE_HEAP_SIZE);
+        MinMaxHeap<Integer> heap = new MinMaxHeap<>(shuffledElements.toArray(Integer[]::new)); // creating the heap
+        while (heap.getSize() != 0) {
+            heap.deleteMin();
+        }
+        assertThrows(Exception.class,heap::deleteMin);
+    }
+    @Test
+    public void insertAndDeleteSingleElement1000Times(){ // also using resizing
+        MinMaxHeap<Integer> heap = new MinMaxHeap<>(LARGE_HEAP_SIZE);
+        for (int i = 0; i < 1000; i++) {
+            heap.insert(1);
+            assertEquals((Integer) 1, heap.deleteMin());
+        }
+        assertEquals(0, heap.getSize());
+        MinMaxHeap<Integer>heapWith1000 = new MinMaxHeap<>(1000);
+        for (int i = 0; i < 1000; i++){
+            heapWith1000.insert(1);
+        }
+        for (int i = 0; i < 1000; i++) {
+            heapWith1000.deleteMax();
+        }
+        assertEquals(0, heapWith1000.getSize());
+    }
+    /*
+   @Test
+   public void mappingAfterInsertionToAnExistingHeap(){
+        int maxIndex;
+        int minIndex;
+        List<Integer> shuffledElements = makeShuffledElementList(LARGE_HEAP_SIZE);
+        MinMaxHeap<Integer> heap = new MinMaxHeap<>(shuffledElements.toArray(Integer[]::new)); // creating the heap
+        heap.insert(10000);
+        heap.insert(-5);
+        heap.insert(50);
+        for(int i = 1; i <= heap.getSize(); i++){
+            maxIndex =
+        }
+    }
+    */
+    @Test
+    public void negativeCapacityHeapThrowsException(){
+        assertThrows(IllegalArgumentException.class, () -> new MinMaxHeap<>(-5));
+    }
+    @Test
+    public void heapPropertyTestAfterFewInsertionsAndDeletions() {
+        MinMaxHeap<Integer> heap = new MinMaxHeap<>(LARGE_HEAP_SIZE);
+        for (int i = 1; i <= 100; i++){
+            heap.insert(i);
+        }
+        heap.insert(101);
+        assertEquals((Integer) (101), heap.deleteMax());
+        heap.insert(-100);
+        assertEquals((Integer) (-100), heap.deleteMin());
+        assertEquals((Integer) (1), heap.findMin());
+        assertEquals((Integer) (100), heap.findMax());
+    }
 
+    @Test
+    public void insertNullException()   {
+        MinMaxHeap<Integer> heap = new MinMaxHeap(LARGE_HEAP_SIZE);
+        assertThrows(IllegalArgumentException.class, () -> heap.insert(null));
+    }
+    @Test
+    public void stressTestRandomData()  {
+        MinMaxHeap<Integer> heap = new MinMaxHeap<>(100000);
+        Random random = new Random();
+        for (int i = 0; i < 100000; i++) {
+            heap.insert(random.nextInt());
+        }
+        while (heap.getSize() > 0) {
+            heap.deleteMin();
+        }
+        assertEquals(0, heap.getSize());
+    }
+    @Test
+    public void insertMaxIntegerMinInteger() {
+        MinMaxHeap<Integer> heap = new MinMaxHeap<>();
+        heap.insert(Integer.MAX_VALUE);
+        heap.insert(Integer.MIN_VALUE);
+        assertEquals(Integer.MAX_VALUE, (int) heap.findMax());
+        assertEquals(Integer.MIN_VALUE, (int) heap.findMin());
+    }
+    @Test
+    public void heapWithString() {
+        MinMaxHeap<String> heap = new MinMaxHeap<>();
+        heap.insert("Sung Jin-Woo");
+        heap.insert("Cha Hae-In");
+        heap.insert("Choi Jong-In");
+        assertEquals("Sung Jin-Woo", heap.findMax());
+        assertEquals("Cha Hae-In", heap.findMin());
+    }
+
+    @Test
+    public void deleteTwiceThrowException(){
+        MinMaxHeap<Integer> heap = new MinMaxHeap<>();
+        heap.insert(1);
+        heap.deleteMax();
+        assertThrows(NoSuchElementException.class, heap::deleteMax);
+        assertThrows(NoSuchElementException.class, heap::deleteMax);
+    }
     private List<Integer> makeShuffledElementList(int stop) {
         List<Integer> shuffledElements = IntStream.range(0, stop).boxed().collect(Collectors.toCollection(ArrayList::new));
         Collections.shuffle(shuffledElements, new Random(FIXED_RANDOMNESS_SEED));
-
         return shuffledElements;
     }
-
     private <T extends Comparable<T>> List<T> repeatedDeleteMin(MinMaxHeap<T> heap) {
         List<T> repeatedMinimums = new ArrayList<>();
 
@@ -163,5 +289,4 @@ public class MinMaxHeapTest {
         }
         return isSorted;
     }
-
 }
