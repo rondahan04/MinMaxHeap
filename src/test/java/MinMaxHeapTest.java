@@ -51,11 +51,9 @@ public class MinMaxHeapTest {
 
     @Test
     public void repeatedDeleteMinProducesAscendingElementConstructedFromArray() {
-        List<Integer> shuffledElements = makeShuffledElementList(LARGE_HEAP_SIZE);
-
+        List<Integer> shuffledElements = makeShuffledElementList();
         MinMaxHeap<Integer> heap = new MinMaxHeap<>(shuffledElements.toArray(Integer[]::new));
         List<Integer> repeatedMinimums = repeatedDeleteMin(heap);
-
         assertTrue(isSortedAscending(repeatedMinimums));
 
     }
@@ -63,25 +61,20 @@ public class MinMaxHeapTest {
     @Test
     public void repeatedDeleteMinProducesAscendingElementConstructedFromInsertions() {
         int size = LARGE_HEAP_SIZE;
-        List<Integer> shuffledElements = makeShuffledElementList(size);
-
+        List<Integer> shuffledElements = makeShuffledElementList();
         MinMaxHeap<Integer> heap = new MinMaxHeap<>(size);
         for (Integer element : shuffledElements) {
             heap.insert(element);
         }
-
         List<Integer> repeatedMinimums = repeatedDeleteMin(heap);
-
         assertTrue(isSortedAscending(repeatedMinimums));
 
     }
 
     @Test
     public void findMinDeleteMinEquivalence() {
-        List<Integer> shuffledElements = makeShuffledElementList(LARGE_HEAP_SIZE);
-
+        List<Integer> shuffledElements = makeShuffledElementList();
         MinMaxHeap<Integer> heap = new MinMaxHeap<>(shuffledElements.toArray(Integer[]::new));
-
         while (heap.getSize() > 0) {
             assertEquals(heap.findMin(), heap.deleteMin());
         }
@@ -115,7 +108,7 @@ public class MinMaxHeapTest {
 
     @Test
     public void repeatedDeleteMaxProducesDescendingElementConstructedFromArray() {
-        List<Integer> shuffledElements = makeShuffledElementList(LARGE_HEAP_SIZE);
+        List<Integer> shuffledElements = makeShuffledElementList();
         MinMaxHeap<Integer> heap = new MinMaxHeap<>(shuffledElements.toArray(Integer[]::new));
         List<Integer> repeatedMaximums = repeatedDeleteMax(heap);
         Collections.reverse(repeatedMaximums);
@@ -124,9 +117,8 @@ public class MinMaxHeapTest {
 
     @Test
     public void repeatedDeleteMaxProducesDescendingElementConstructedFromInsertions() {
-        int size = LARGE_HEAP_SIZE;
-        List<Integer> shuffledElements = makeShuffledElementList(size);
-        MinMaxHeap<Integer> heap = new MinMaxHeap<>(size);
+        List<Integer> shuffledElements = makeShuffledElementList();
+        MinMaxHeap<Integer> heap = new MinMaxHeap<>(LARGE_HEAP_SIZE);
         for (Integer element : shuffledElements) {
             heap.insert(element);
         }
@@ -137,7 +129,7 @@ public class MinMaxHeapTest {
 
     @Test
     public void findMaxDeleteMaxEquivalence() {
-        List<Integer> shuffledElements = makeShuffledElementList(LARGE_HEAP_SIZE);
+        List<Integer> shuffledElements = makeShuffledElementList();
         MinMaxHeap<Integer> heap = new MinMaxHeap<>(shuffledElements.toArray(Integer[]::new));
         while (heap.getSize() > 0) {
             assertEquals(heap.findMax(), heap.deleteMax());
@@ -160,7 +152,7 @@ public class MinMaxHeapTest {
     }
     @Test
     public void deleteUntilZeroCapacityThenTryInsert(){
-        List <Integer> shuffledElements = makeShuffledElementList(LARGE_HEAP_SIZE);
+        List <Integer> shuffledElements = makeShuffledElementList();
         MinMaxHeap<Integer> heap = new MinMaxHeap<>(shuffledElements.toArray(Integer[]::new)); // creating the heap
         while (heap.getSize() != 0) {
             heap.deleteMin();
@@ -185,11 +177,11 @@ public class MinMaxHeapTest {
         assertEquals(0, heapWith1000.getSize());
     }
 
-   @Test
-   public void mappingAfterInsertionToAnExistingHeap() throws NoSuchFieldException, IllegalAccessException{
+    @Test
+    public void mappingAfterInsertionToAnExistingHeap() throws NoSuchFieldException, IllegalAccessException{
         int maxIndex;
         int minIndex;
-        List<Integer> shuffledElements = makeShuffledElementList(LARGE_HEAP_SIZE);
+        List<Integer> shuffledElements = makeShuffledElementList();
         MinMaxHeap<Integer> heap = new MinMaxHeap<>(shuffledElements.toArray(Integer[]::new)); // creating the heap
         heap.insert(10000);
         heap.insert(-5);
@@ -305,7 +297,51 @@ public class MinMaxHeapTest {
             assertEquals(maxHeap[i], minHeap[minIndex]);
         }
     }
-
+    @Test
+    public void testMinToMaxDeletionWithReflection() throws NoSuchFieldException, IllegalAccessException {
+        MinMaxHeap<Integer> heap = new MinMaxHeap<>(10);
+        for(int i=1; i<=10; i++){
+            heap.insert(i);
+        }
+        int deletedVal = heap.deleteMax();
+        System.out.println ("The deleted Value is" + deletedVal);
+        Field minToMaxField = MinMaxHeap.class.getDeclaredField("minToMax");
+        minToMaxField.setAccessible(true);
+        int[] minToMax = (int[]) minToMaxField.get(heap);
+        Field minHeapField = MinMaxHeap.class.getDeclaredField("minHeap");
+        Field maxHeapField = MinMaxHeap.class.getDeclaredField("maxHeap");
+        minHeapField.setAccessible(true);
+        maxHeapField.setAccessible(true);
+        Comparable[] minHeap = (Comparable[]) minHeapField.get(heap);
+        Comparable[] maxHeap = (Comparable[]) maxHeapField.get(heap);
+        for (int i = 1; i <= 10; i++) {
+            int maxIndex = minToMax[i];
+            assertEquals(minHeap[i], maxHeap[maxIndex]);
+        }
+    }
+    @Test
+    public void TestMaxToMinDeletionWithReflection () throws NoSuchFieldException, IllegalAccessException {
+        MinMaxHeap<Integer> heap = new MinMaxHeap<>(10);
+        for(int i=1; i<=10; i++){
+            heap.insert(i);
+        }
+        int deletedVal = heap.deleteMin();
+        System.out.println("The Deleted Value Is" + deletedVal);
+        heap.deleteMin(); // try another deletion
+        Field maxToMinField = MinMaxHeap.class.getDeclaredField("maxToMin");
+        maxToMinField.setAccessible(true);
+        int[] maxToMin = (int[]) maxToMinField.get(heap);
+        Field minHeapField = MinMaxHeap.class.getDeclaredField("minHeap");
+        Field maxHeapField = MinMaxHeap.class.getDeclaredField("maxHeap");
+        minHeapField.setAccessible(true);
+        maxHeapField.setAccessible(true);
+        Comparable[] minHeap = (Comparable[]) minHeapField.get(heap);
+        Comparable[] maxHeap = (Comparable[]) maxHeapField.get(heap);
+        for (int i = 1; i <= 10; i++) {
+            int minIndex = maxToMin[i];
+            assertEquals(maxHeap[i], minHeap[minIndex]);
+        }
+    }
     @Test
     public void deleteTwiceThrowException(){
         MinMaxHeap<Integer> heap = new MinMaxHeap<>();
@@ -314,9 +350,10 @@ public class MinMaxHeapTest {
         assertThrows(NoSuchElementException.class, heap::deleteMax);
         assertThrows(NoSuchElementException.class, heap::deleteMax);
     }
-    private List<Integer> makeShuffledElementList(int stop) {
-        List<Integer> shuffledElements = IntStream.range(0, stop).boxed().collect(Collectors.toCollection(ArrayList::new));
+    private List<Integer> makeShuffledElementList() {
+        List<Integer> shuffledElements = IntStream.range(0, LARGE_HEAP_SIZE).boxed().collect(Collectors.toCollection(ArrayList::new));
         Collections.shuffle(shuffledElements, new Random(FIXED_RANDOMNESS_SEED));
+
         return shuffledElements;
     }
     private <T extends Comparable<T>> List<T> repeatedDeleteMin(MinMaxHeap<T> heap) {

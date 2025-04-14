@@ -21,7 +21,7 @@ public class GottRider implements Comparable<GottRider>{
     public String toString() {
         return "Name: " + this.name + " Previous Rides: " + this.previousRides + " Average Review: " + this.averageReview;
     }
-    public int compareTo (GottRider otherRider) { // add comments
+    public int compareTo (GottRider otherRider) {
         if (this.averageReview < otherRider.getAverageReviewGiven()) { // this rider average is less than otherRider
             return -1;
         } else if (this.averageReview > otherRider.getAverageReviewGiven()) { // otherRider average is less than this rider
