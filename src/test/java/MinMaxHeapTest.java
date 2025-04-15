@@ -39,7 +39,6 @@ public class MinMaxHeapTest {
         assertThrows(Exception.class, heap::deleteMin);
 
     }
-
     @Test
     public void heapResizesAndUpdatesSizeCorrectly() {
         MinMaxHeap<Integer> heap = new MinMaxHeap<>(1);
@@ -48,7 +47,6 @@ public class MinMaxHeapTest {
         }
         assertEquals(comparables.length, heap.getSize());
     }
-
     @Test
     public void repeatedDeleteMinProducesAscendingElementConstructedFromArray() {
         List<Integer> shuffledElements = makeShuffledElementList();
@@ -57,7 +55,6 @@ public class MinMaxHeapTest {
         assertTrue(isSortedAscending(repeatedMinimums));
 
     }
-
     @Test
     public void repeatedDeleteMinProducesAscendingElementConstructedFromInsertions() {
         int size = LARGE_HEAP_SIZE;
@@ -70,7 +67,6 @@ public class MinMaxHeapTest {
         assertTrue(isSortedAscending(repeatedMinimums));
 
     }
-
     @Test
     public void findMinDeleteMinEquivalence() {
         List<Integer> shuffledElements = makeShuffledElementList();
@@ -105,7 +101,6 @@ public class MinMaxHeapTest {
         assertEquals(one, heap.findMin());
         assertEquals(3, heap.getSize());
     }
-
     @Test
     public void repeatedDeleteMaxProducesDescendingElementConstructedFromArray() {
         List<Integer> shuffledElements = makeShuffledElementList();
@@ -114,7 +109,6 @@ public class MinMaxHeapTest {
         Collections.reverse(repeatedMaximums);
         assertTrue(isSortedAscending(repeatedMaximums));
     }
-
     @Test
     public void repeatedDeleteMaxProducesDescendingElementConstructedFromInsertions() {
         List<Integer> shuffledElements = makeShuffledElementList();
@@ -126,7 +120,6 @@ public class MinMaxHeapTest {
         Collections.reverse(repeatedMaximums);
         assertTrue(isSortedAscending(repeatedMaximums));
     }
-
     @Test
     public void findMaxDeleteMaxEquivalence() {
         List<Integer> shuffledElements = makeShuffledElementList();
@@ -198,7 +191,7 @@ public class MinMaxHeapTest {
         int[] maxToMin = (int[]) maxToMinField.get(heap);
         Comparable[] minHeap = (Comparable[]) minHeapField.get(heap);
         Comparable[] maxHeap = (Comparable[]) maxHeapField.get(heap);
-        for (int i = 1; i<= heap.getSize(); i++){
+        for (int i = 1; i<= heap.getSize(); i++){ // this is what it actually checks
             maxIndex = minToMax[i];
             minIndex = maxToMin[i];
             assertEquals(minHeap[i], maxHeap[maxIndex]);

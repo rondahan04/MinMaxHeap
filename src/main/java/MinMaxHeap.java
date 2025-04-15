@@ -90,7 +90,7 @@ public class MinMaxHeap <T extends Comparable <T>>{
         this.minToMax = newMinToMaxMapping;
         this.maxToMin = newMaxToMinMapping;
     }
-   public T deleteMin() { // O(Log(n)), delete min from maxHeap and minHeap and update the minToMax and maxToMin
+    public T deleteMin() { // O(Log(n)), delete min from maxHeap and minHeap and update the minToMax and maxToMin
        if (size == 0) {
            throw new NoSuchElementException("No element to be removed as the heap is empty.");
        }
