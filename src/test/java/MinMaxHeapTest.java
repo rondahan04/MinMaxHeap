@@ -215,7 +215,6 @@ public class MinMaxHeapTest {
         assertEquals((Integer) (1), heap.findMin());
         assertEquals((Integer) (100), heap.findMax());
     }
-
     @Test
     public void insertNullException()   {
         MinMaxHeap<Integer> heap = new MinMaxHeap(LARGE_HEAP_SIZE);

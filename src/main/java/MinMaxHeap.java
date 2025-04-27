@@ -102,7 +102,7 @@ public class MinMaxHeap <T extends Comparable <T>>{
         percolateDownMax(1); // according to the heap prop.
         swapMin(index, this.size+1); // swap the element with the last one
         percolateDownMin(index); // according to the heap prop.
-         return max;
+        return max;
     }
     public T findMin(){ // O(1) returns the minimum element in the heap otherwise, throws an exception.
         if (isEmpty()){
@@ -184,7 +184,7 @@ public class MinMaxHeap <T extends Comparable <T>>{
         T[] newMaxHeap = (T[]) new Comparable[this.capacity]; // creating a new MaxHeap with 2*capacity
         int[] newMinToMaxMapping = new int[this.capacity]; // creating a new minToMax mapping with 2*capacity
         int[] newMaxToMinMapping = new int[this.capacity]; // creating a new maxToMin mapping with 2*capacity
-        for (int i = 1; i <= this.size; i++) { // create new mappings i starts from 1 because of the 1 based indexing until this.size which is the last element.
+        for (int i = 1; i <= this.size; i++) { // create new mappings index starts from 1 because of the 1 based indexing until this.size which is the last element.
             newMinHeap[i] = this.minHeap[i];
             newMaxHeap[i] = this.maxHeap[i];
             newMinToMaxMapping[i] = this.minToMax[i];
@@ -196,13 +196,13 @@ public class MinMaxHeap <T extends Comparable <T>>{
         this.minToMax = newMinToMaxMapping;
         this.maxToMin = newMaxToMinMapping;
     }
-    private int parent(int i){ // O(1), helper function for better readabillity
-        return (i / 2); // no need floor as its int.
+    private int parent(int i){ // O(1), helper function for better readability
+        return (i / 2);
     }
-    private int leftChild (int i){ //O(1), helper function for better readabillity
+    private int leftChild (int i){ //O(1), helper function for better readability
         return (2 * i);
     }
-    private int rightChild (int i){ //O(1), helper function for better readabillity
+    private int rightChild (int i){ //O(1), helper function for better readability
         return (2 * i + 1);
     }
     private void swapMax (int i, int j){ //O(1) helper function for the percolate function.
@@ -214,7 +214,7 @@ public class MinMaxHeap <T extends Comparable <T>>{
         this.maxToMin[i] = this.maxToMin[j];
         this.maxToMin[j] = tempElementIndex;
         this.minToMax[this.maxToMin[i]] = i;
-        minToMax[this.maxToMin[j]] = j;
+        this.minToMax[this.maxToMin[j]] = j;
     }
     private void swapMin (int i, int j){ // O(1) helper function for the percolate function.
         int tempElementIndex;
